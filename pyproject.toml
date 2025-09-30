@@ -1,0 +1,25 @@
+[project]
+name = "epolin"
+version = "0.1.0"
+description = "Epolin using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai-tools[mcp]>=0.75.0",
+    "crewai[tools]>=0.186.1,<1.0.0",
+    "mcp>=1.15.0",
+]
+
+[project.scripts]
+epolin = "epolin.main:run"
+run_crew = "epolin.main:run"
+train = "epolin.main:train"
+replay = "epolin.main:replay"
+test = "epolin.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

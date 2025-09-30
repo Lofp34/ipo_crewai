@@ -1,0 +1,74 @@
+tasks:
+  t1_profil_linkedin:
+    description: >
+      1. Utilise search_linkedin_users pour chercher le profil LinkedIn de {info_prospect}.
+      
+      2. Une fois le profil trouvé, utilise get_linkedin_profile avec l'URN du profil 
+      (format: fsd_profile:XXXXX) pour récupérer les détails complets.
+      
+      3. Retranscris l'intégralité des informations dans le fichier de sortie.
+      
+      IMPORTANT: Pour get_linkedin_profile, utilise seulement l'URN du profil, 
+      pas toutes les données JSON du profil.
+    expected_output: >
+      Un fichier contenant toutes les informations détaillées du profil LinkedIn 
+      de prospect, incluant expérience, éducation, compétences, etc.
+    output_file: "01_PROFIL_LINKEDIN.md"
+    agent: profil_social_agent 
+
+  t2_cinq_derniers_posts:
+    description: >
+      À partir de {info_prospect}et de son URN, récupérer les 5 DERNIERS posts du prospect (texte intégral + métadonnées :
+      date, type, éventuels liens/médias). Aucune troncature.
+    expected_output: "Liste des 5 derniers posts avec contenu complet et métadonnées"
+    output_file: "02_POSTS_LINKEDIN.md"
+    agent: profil_social_agent
+
+  t3_commentaires_du_prospect_sur_posts:
+    description: >
+      Retrouver les commentaires laissés par le prospect sur les publications linkedin d'autres utilisateurs.
+      Pour chaque correspondance, inclure le CONTENU du post commenté puis, en dessous, le commentaire du prospect.
+    expected_output: "Liste des interactions du prospect avec nos contenus"
+    output_file: "03_COMMENTAIRES_PROSPECT_SUR_NOS_POSTS.md"
+    agent: profil_social_agent
+
+  t4_fiche_entreprise_site:
+    description: >
+      À partir de {website_url}, scraper le site du prospect (pages clés: Accueil, Produits/Offres, À propos,
+      Carrières, Mentions légales, Blog/Actus, Cas clients). Produire une fiche entreprise synthétique et structurée.
+      Extraire SIREN/SIRET depuis les mentions légales si présent.
+    expected_output: "Fiche entreprise complète avec informations légales"
+    output_file: "04_FICHE_ENTREPRISE_SITE.md"
+    agent: web_company_agent
+
+  t5_fiche_officielle_mcp:
+    description: >
+      Si SIREN/SIRET trouvé à l'étape précédente, interroger le MCP "recherche-entreprises".
+      Sinon, requêter par dénomination sociale. Restituer un extrait maximal d'informations utiles.
+    expected_output: "Fiche officielle de l'entreprise depuis les bases gouvernementales"
+    output_file: "05_FICHE_SIRENE_MCP.md"
+    agent: web_company_agent
+
+  t6_veille_sectorielle:
+    description: >
+      Déduire le secteur/NAF du prospect (via t4/t5) et compiler une veille courte :
+      6–8 points d'actualité récents, tendances, acteurs clés, signaux réglementaires/tech. Inclure des sources (titres + URLs).
+    expected_output: "Synthèse de veille sectorielle avec sources"
+    output_file: "06_VEILLE_SECTORIELLE.md"
+    agent: sector_watch_agent
+
+  t7_strategie_prise_de_contact:
+    description: >
+      À partir de 01–06, rédiger une stratégie de prise de contact qualitative et personnalisée :
+      hypothèses de pains, angles de valeur, mapping message→personae, séquence multicanale (email/LinkedIn/appel),
+      scripts courts (3–5 emails, 2–3 DMs, 1 opener d'appel), variantes de ton (sobre/énergique), et 5 objets d'email.
+    context:
+      - t1_profil_linkedin
+      - t2_cinq_derniers_posts
+      - t3_commentaires_du_prospect_sur_posts
+      - t4_fiche_entreprise_site
+      - t5_fiche_officielle_mcp
+      - t6_veille_sectorielle
+    expected_output: "Stratégie de prise de contact personnalisée avec scripts et séquences"
+    output_file: "07_STRATEGIE_CONTACT.md"
+    agent: outreach_strategy_agent
